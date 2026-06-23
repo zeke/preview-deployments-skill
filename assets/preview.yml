@@ -24,11 +24,14 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - uses: actions/checkout@v5
+      # Before copying this template, recheck the latest stable tags for
+      # actions/checkout and actions/setup-node. Last checked 2026-06-23:
+      # actions/checkout@v7.0.0, actions/setup-node@v6.4.0.
+      - uses: actions/checkout@v7.0.0
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6.4.0
         with:
           node-version: 24
           cache: npm
@@ -50,11 +53,14 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v5
+      # Before copying this template, recheck the latest stable tags for
+      # actions/checkout and actions/setup-node. Last checked 2026-06-23:
+      # actions/checkout@v7.0.0, actions/setup-node@v6.4.0.
+      - uses: actions/checkout@v7.0.0
         with:
           ref: ${{ github.event.repository.default_branch }}
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6.4.0
         with:
           node-version: 24
           cache: npm

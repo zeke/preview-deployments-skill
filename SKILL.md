@@ -22,6 +22,7 @@ Use GitHub's Deployments API for PR UI status. Do not use issue comments, PR com
 3. Detect Cloudflare bindings: D1, R2, KV, Queues, Durable Objects, Workers AI, Browser Rendering, Vectorize, Hyperdrive, service bindings, assets, containers, cron triggers, and routes.
 4. Check whether a `scripts/` or `script/` directory exists and follow that convention.
 5. Verify current Wrangler behavior from docs or local `node_modules/wrangler/config-schema.json` before relying on config fields or CLI flags.
+6. Resolve the latest stable GitHub Action versions before writing workflow YAML. Do not rely on the versions in `assets/preview.yml` without checking.
 
 ## Required Questions
 
@@ -59,6 +60,21 @@ permissions:
 - Set repository secrets with `gh secret set`, especially `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`.
 - Use `npx wrangler`, not a globally installed Wrangler.
 - Use JSONC Wrangler config, not TOML.
+
+## Action Version Check
+
+Before writing or updating `.github/workflows/preview.yml`, check the latest available tags for any GitHub Actions used in the workflow, including `actions/checkout`, `actions/setup-node`, and any project-specific actions.
+
+Preferred check:
+
+```bash
+gh release view actions/checkout --json tagName -q .tagName
+gh release view actions/setup-node --json tagName -q .tagName
+```
+
+If release lookup fails, use `gh api repos/<owner>/<repo>/releases/latest --jq .tag_name` or inspect tags with `gh api repos/<owner>/<repo>/tags --jq '.[0].name'`. Use the latest stable major tag unless the project pins full SHAs or exact versions by policy.
+
+See `references/action-versions.md` for details.
 
 ## GitHub Deployments API
 

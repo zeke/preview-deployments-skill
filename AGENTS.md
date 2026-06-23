@@ -7,6 +7,7 @@ This repository contains the `preview-deployments-skill` Agent Skill. The skill 
 - `SKILL.md`: primary skill instructions. Keep this compact and task-oriented.
 - `references/`: detailed implementation notes loaded only when needed.
 - `assets/`: copyable workflow and script templates for target projects.
+- `graphic/`: browser-rendered source for the README/social graphic.
 - `README.md`: concise human-facing description and installation instructions.
 
 ## Validation
@@ -19,3 +20,4 @@ This repository contains the `preview-deployments-skill` Agent Skill. The skill 
 
 - Revise this file whenever meaningful project conventions, validation commands, or skill packaging details change.
 - When changing preview deployment guidance, check whether the examples in `assets/` and details in `references/` also need updates.
+- When workflow template guidance changes, keep `references/action-versions.md` aligned.
