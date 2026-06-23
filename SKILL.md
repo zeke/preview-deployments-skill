@@ -29,7 +29,7 @@ Use GitHub's Deployments API for PR UI status. Do not use issue comments, PR com
 Ask these before implementation if the answers are not clear from the repo or user request:
 
 1. What app name should be used in Worker/resource names and preview URLs?
-2. What workers.dev subdomain should previews use?
+2. What workers.dev subdomain should previews use? First try to infer it from existing workers.dev URLs in README/docs/workflows, GitHub Deployment `environment_url` values, deploy scripts, Wrangler config context, or previous workflow output. Ask if not confident.
 3. Should previews share production resources, create empty per-PR resources, or create per-PR resources seeded from production?
 4. Should preview deploys start before CI finishes? Recommended: yes, keep CI as the merge-readiness signal.
 5. Are fork PRs expected? If yes, explain that `pull_request` workflows do not expose secrets to forks and `pull_request_target` is a security-sensitive exception.
@@ -146,6 +146,10 @@ After editing the target app:
 3. Confirm required GitHub secrets are present with `gh secret list`.
 4. Open or update a PR and verify the GitHub PR shows a Deployment with the preview URL.
 5. Close or merge a test PR and verify the Worker and per-PR resources are removed or inactive.
+
+## After Successful Setup
+
+Only after the target repo has a working preview deployment process, mention any gaps, bugs, ambiguity, missing resource patterns, or reusable improvements discovered while applying this skill. If something would help future users, ask whether the user wants to open an issue or PR on `https://github.com/zeke/preview-deployments-skill`. Do not interrupt setup with this request, and do not ask before the preview flow works.
 
 ## Common Bugs To Avoid
 
