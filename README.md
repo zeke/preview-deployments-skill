@@ -4,6 +4,8 @@ An agent skill to add preview deployments to your Cloudflare apps using GitHub A
 
 ![Preview deployments screenshot](assets/preview-deployments-screenshot.jpg)
 
+![Preview deployment in a pull request](demo-thumb.jpg)
+
 ## Install
 
 ```bash
