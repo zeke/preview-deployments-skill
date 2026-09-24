@@ -16,3 +16,7 @@ npx skills add zeke/preview-deployments-skill --global --yes --all
 - Publishes preview status through GitHub Deployments, not PR comments.
 - Supports shared production resources, empty per-PR resources, or seeded per-PR resources.
 - Tears previews down when PRs close or merge.
+
+## More Skills
+
+Browse more skills at [zeke/skills](https://github.com/zeke/skills).
