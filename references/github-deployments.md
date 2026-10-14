@@ -2,6 +2,13 @@
 
 Use GitHub Deployments to show preview state in the PR UI. Do not use comments for preview status.
 
+The Cloudflare tooling does less here:
+
+- Workers Builds posts PR comments and check runs, with no Deployments.
+- `cloudflare/wrangler-action@v4` with `gitHubToken` posts one `success` Deployment per run. It uses the branch as `ref`, the Preview name as the environment, and the Cloudflare dashboard as `log_url`. It has no `in_progress`, `failure`, or `inactive` statuses, no `transient_environment`, no stale-run guard, and no cleanup.
+
+Use the script in `assets/preview-env.mjs` when the PR UI should reflect the full lifecycle.
+
 ## Workflow Permissions
 
 ```yaml
@@ -46,6 +53,8 @@ await githubApi(`/repos/${repo}/deployments/${deploymentId}/statuses`, {
   },
 });
 ```
+
+For native Worker Previews, set `environment_url` to the stable Preview URL (`preview_urls[0]`). Put the fixed Deployment URL (`deployment_urls[0]`) in the job summary.
 
 Use these states:
 

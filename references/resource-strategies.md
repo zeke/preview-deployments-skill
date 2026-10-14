@@ -1,44 +1,63 @@
 # Resource Strategies
 
-Pick one strategy explicitly. Do not infer this silently.
+Pick one strategy explicitly. Do not infer it silently.
+
+Durable Objects and Containers do not need a strategy with native Worker Previews. Each Preview gets its own namespace automatically. These strategies cover account-level resources: D1, KV, R2, Queue producers, Vectorize, Hyperdrive, Analytics Engine, Pipelines, and similar.
+
+## Shared Staging Resources
+
+The base `previews` block (Wrangler) or `ctx.isPreview` branch (`cf`) points every Preview at one set of staging resources.
+
+Use when:
+
+- Previews need realistic-looking data but must not touch production.
+- Previews may see each other's writes.
+- Fast setup matters. This is the setup the Cloudflare docs show.
+
+Rules:
+
+- Create staging resources once, outside CI, and commit their IDs in the `previews` block.
+- D1 migrations: add `wrangler.preview-migrations.jsonc`, which declares the staging database as a top-level `d1_databases` entry (for example binding `PREVIEW_DB`) with the same `database_name`, `database_id`, and `migrations_dir`. Run `npx wrangler d1 migrations apply PREVIEW_DB --remote --config wrangler.preview-migrations.jsonc` before `wrangler preview`.
+- A PR's migrations run against the shared staging DB and affect every other Preview. If PRs often change schemas, prefer per-PR resources.
+- A branch can isolate itself by changing both the `previews` binding and the migrations config to another database.
 
 ## Shared Production Resources
 
-Preview Worker points at the same D1, R2, KV, AI Gateway, Vectorize, or other bindings as production.
+The `previews` block points at production resource IDs.
 
 Use when:
 
-- The app is mostly read-only in previews.
+- The app is read-only in previews.
 - Realistic production data matters more than isolation.
-- The user accepts that writes can affect production data.
+- The user explicitly accepts that writes reach production.
 
 Rules:
 
-- Document this clearly in the deployment description and project instructions.
-- Do not include production routes in preview config.
-- Consider disabling write paths or background processors in previews.
+- Document this in the deployment description and in the project's AGENTS.md.
+- Queue producers pointed at production queues are consumed by production.
+- Consider disabling write paths or background work in previews with a `previews.vars` flag.
 
-Observed example: `tldw` shared production D1/R2/AI so real videos rendered in previews, while container-backed processing was not wired on previews.
+Observed example: `tldw` shared production D1, R2, and AI so real videos rendered in previews. Container-backed processing was not wired up for previews.
 
 ## Empty Per-PR Resources
 
-Create separate resources for each PR and leave them empty except migrations or seed fixtures.
+CI creates resources named `<worker>-pr-<number>` and leaves them empty except for migrations or seed fixtures.
 
 Use when:
 
-- Writes must be isolated.
-- Real production data is not needed.
-- Fast setup matters.
+- Writes must be isolated per PR.
+- Production data is not needed.
 
 Rules:
 
-- Name resources with `<app>-pr-<number>`.
-- Apply migrations after creating D1.
-- Delete resources on PR close.
+- Create resources, then generate a config copy that overrides the matching `previews.*` bindings with the new IDs. Write it next to `wrangler.jsonc` (for example `wrangler.preview.generated.jsonc`, gitignored) and pass `--config` to `wrangler preview` and `wrangler d1 migrations apply`.
+- `cf` projects: read per-PR IDs from environment variables in the `ctx.isPreview` branch of `cloudflare.config.ts`. Verify that `cf previews deploy` exposes `process.env` to the config module before relying on this.
+- Reuse existing resources on `synchronize`. Look up by name before creating.
+- Delete resources on PR close, after deleting the Preview.
 
 ## Seeded Per-PR Resources
 
-Create separate resources for each PR and copy production data into them.
+Same as empty per-PR resources, plus a copy of production data.
 
 Use when:
 
@@ -48,12 +67,14 @@ Use when:
 
 Rules:
 
-- Export production D1, import into preview D1, then apply PR migrations.
-- Reuse per-PR resources across synchronize events when that is faster.
-- Be explicit that preview data can be overwritten by later deploys.
+- Export production D1, import into the per-PR D1, then apply the PR's migrations.
+- Reseeding on every push overwrites preview data. Decide whether to seed only on creation.
 
-Observed example: `yogo-api` created per-PR D1 and Queue resources, seeded D1 from production, generated a temporary Wrangler config, and deleted resources on PR close.
+Observed example: `yogo-api` created per-PR D1 and Queue resources, seeded D1 from production, generated a temporary Wrangler config, and deleted the resources on PR close.
 
 ## Recommended Default
 
-For apps with user writes or background jobs, prefer seeded per-PR resources when setup time is acceptable. Otherwise prefer empty per-PR resources. Use shared production resources only when previews are read-only or the user explicitly chooses it.
+- Apps with no account-level bindings, or only Durable Objects: no strategy needed. Use an empty `previews` block plus `vars`.
+- Most apps with storage: shared staging resources.
+- Apps whose PRs often change schemas or run destructive writes: per-PR resources, seeded if realistic data matters.
+- Shared production only for read-only previews or explicit user choice.
