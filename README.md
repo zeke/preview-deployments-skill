@@ -1,6 +1,6 @@
 # preview-deployments-skill
 
-An agent skill to add preview deployments to your Cloudflare apps using GitHub Actions workflows and the GitHub Deployments API.
+An agent skill to add preview deployments to your Cloudflare apps using [Worker Previews](https://developers.cloudflare.com/workers/previews/), GitHub Actions workflows, and the GitHub Deployments API.
 
 ![Preview deployments screenshot](assets/preview-deployments-screenshot.jpg)
 
@@ -12,10 +12,11 @@ npx skills add zeke/preview-deployments-skill --global --yes --all
 
 ## What It Does
 
-- Adds per-PR Cloudflare Workers preview deployments.
+- Adds a Worker Preview for each pull request with `wrangler preview` or `cf previews deploy`.
 - Publishes preview status through GitHub Deployments, not PR comments.
-- Supports shared production resources, empty per-PR resources, or seeded per-PR resources.
+- Helps choose between shared staging, shared production, or per-PR resources.
 - Tears previews down when PRs close or merge.
+- Falls back to a separate Worker per PR when an app needs something Previews can't do yet, like Queue consumers or crons.
 
 ## More Skills
 

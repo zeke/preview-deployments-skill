@@ -30,6 +30,18 @@ Preview workflows commonly use:
 - `actions/checkout`
 - `actions/setup-node`
 - `actions/github-script`, if using inline GitHub API calls instead of a project script
+- `cloudflare/wrangler-action`, if the target repo uses it instead of `npx wrangler preview`
 - Cloudflare or framework-specific actions already present in the repo
 
-The template mostly uses Node scripts and `npx wrangler`, so `checkout` and `setup-node` are the baseline checks.
+The template uses Node scripts and `npx wrangler` or `npx cf`, so `checkout` and `setup-node` are the baseline checks.
+
+## CLI Versions
+
+Native Worker Previews need project-local CLI versions, not global installs:
+
+```bash
+npm view wrangler version
+npm view cf version
+```
+
+Wrangler must be `4.135.0` or later. Install the latest as a devDependency, and do not downgrade an existing newer version.
