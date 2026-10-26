@@ -8,7 +8,10 @@ Use GitHub Deployments to show preview state in the PR UI. Do not use comments f
 permissions:
   contents: read
   deployments: write
+  pull-requests: read
 ```
+
+`pull-requests: read` covers the PR head lookup used by the stale-run guard. Without it, `GET /pulls/{number}` returns 403 on private repositories, after the deployment was already created.
 
 ## Deployment Shape
 

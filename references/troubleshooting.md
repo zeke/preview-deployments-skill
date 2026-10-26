@@ -22,6 +22,10 @@ Use both layers:
 
 If stale, mark the old deployment `inactive` or `failure` and exit without advertising the URL.
 
+## Deployment Request Fails With 403 On A Private Repo
+
+If the `preview/pr-<number>` environment was created but the run fails with a 403, check the PR head lookup used by the stale-run guard. `GET /repos/{owner}/{repo}/pulls/{number}` needs `pull-requests: read` on private repositories. `contents: read` and `deployments: write` aren't enough. Public repositories hide this because pull requests are publicly readable.
+
 ## Fork PRs Do Not Deploy
 
 Expected with `pull_request`: repository secrets are not exposed to forked PRs. Do not switch to `pull_request_target` casually. It runs with elevated privileges against untrusted PR input unless carefully designed.

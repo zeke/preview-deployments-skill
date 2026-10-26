@@ -52,7 +52,10 @@ concurrency:
 permissions:
   contents: read
   deployments: write
+  pull-requests: read
 ```
+
+`pull-requests: read` is needed for the stale-run guard, which reads the PR head SHA from `GET /repos/{owner}/{repo}/pulls/{number}`. Public repos work without it; private repos return 403.
 
 - Use deterministic names: `<app>-pr-<number>`.
 - Use per-PR GitHub environments, for example `preview/pr-123` or `preview-pr-123`.
